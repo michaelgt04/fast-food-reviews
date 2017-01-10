@@ -1,94 +1,140 @@
 import React, { Component } from 'react';
-import List from './List';
-import Form from './Form';
-import Menu from './Menu';
+import Restaurant from './Restaurant'
+import Form from './Form'
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      city: "",
-      state: "",
-      range: "",
-      type: "food",
-      destinations: [],
-      component: "search"
+      restaurants: [],
+      name: "",
+      category: "American",
+      description: ""
     };
-    this.returnToSearch = this.returnToSearch.bind(this);
-    this.handleCityChange = this.handleCityChange.bind(this);
-    this.handleStateChange = this.handleStateChange.bind(this);
-    this.handleRangeChange = this.handleRangeChange.bind(this);
-    this.handleTypeChange = this.handleTypeChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.getData = this.getData.bind(this);
-    this.deleteLastDestination = this.deleteLastDestination.bind(this);
-    this.switchDestination = this.switchDestination.bind(this);
+    this.handleNameChange = this.handleNameChange.bind(this)
+    this.handleCategoryChange = this.handleCategoryChange.bind(this)
+    this.handleDescriptionChange = this.handleDescriptionChange.bind(this)
+    this.handleSubmit = this.handleSubmit.bind(this)
+    this.handleDelete = this.handleDelete.bind(this)
+    this.handleUpVote = this.handleUpVote.bind(this)
+    this.handleDownVote = this.handleDownVote.bind(this)
   }
 
-  handleCityChange(event) {
-    let newCity = event.target.value;
-    this.setState({city: newCity});
+  handleNameChange(event) {
+    let newName = event.target.value;
+    this.setState({ name: newName })
   }
 
-  handleStateChange(event) {
-    let newState = event.target.value;
-    this.setState({ state: newState});
+  handleCategoryChange(event) {
+    let newCategory = event.target.value;
+    this.setState({ category: newCategory })
   }
 
-  handleRangeChange(event) {
-    let newMileRange = event.target.value;
-    let metersPerMile = 1609.34;
-    let newMeterRange = newMileRange * metersPerMile;
-    this.setState({ range: newMeterRange })
+  handleDescriptionChange(event){
+    let newDescription = event.target.value;
+    this.setState({ description: newDescription })
   }
 
-  handleTypeChange(event) {
-    let newType= event.target.value;
-    this.setState({ type: newType })
+  handleSubmit(event){
+    event.preventDefault()
+    let fetchBody = { name: this.state.name, category: this.state.category, description: this.state.description }
+    let newRestaurants = []
+    fetch('/api/v1/restaurants',
+      { method: "POST",
+      body: JSON.stringify(fetchBody) })
+      .then(function(response) {
+        newRestaurants = response.json()
+        return newRestaurants
+      }).then((response) => this.setState({
+        restaurants: response,
+      }))
   }
 
-  returnToSearch(event) {
-    this.setState({ component: "search" })
+  handleDelete(restaurantId){
+    let fetchBody = { id: restaurantId }
+    let newRestaurants = []
+    fetch(`/api/v1/restaurants/${restaurantId}`,
+    { method: "DELETE",
+    body: JSON.stringify(fetchBody)
+  }).then(function(response) {
+      newRestaurants = response.json()
+      return newRestaurants
+  }).then((response) => this.setState({restaurants: response}))
   }
 
-  getData() {
+  handleUpVote(restaurantId){
+    let fetchBody = { id: restaurantId, type: "up_vote" }
+    let newRestaurants = []
+    fetch(`/api/v1/restaurants/${restaurantId}`,
+    { method: "PATCH",
+    body: JSON.stringify(fetchBody)
+  }).then(function(response) {
+      newRestaurants = response.json()
+      return newRestaurants
+  }).then((response) => this.setState({restaurants: response}))
+  }
+
+  handleDownVote(restaurantId){
+    let fetchBody = { id: restaurantId, type: "down_vote" }
+    let newRestaurants = []
+    fetch(`/api/v1/restaurants/${restaurantId}`,
+    { method: "PATCH",
+    body: JSON.stringify(fetchBody)
+  }).then(function(response) {
+      newRestaurants = response.json()
+      return newRestaurants
+  }).then((response) => this.setState({restaurants: response}))
+  }
+
+  componentDidMount() {
     $.ajax({
-        method: "POST",
-        url: "/yelp/data",
-        data: {type: this.state.type, range: this.state.range, state: this.state.state, city: this.state.city}
+        method: "GET",
+        url: "/restaurants.json",
       })
       .done(data => {
         this.setState({
-          destinations: this.state.destinations.concat(data),
-          component: "list"
+          restaurants: data
         });
       })
   }
 
-  switchDestination() {
-    $.ajax({
-        method: "POST",
-        url: "/yelp/data",
-        data: {type: this.state.type, range: this.state.range, state: this.state.state, city: this.state.city}
-      })
-      .done(data => {
-        this.deleteLastDestination();
-        this.setState({
-          destinations: this.state.destinations.concat(data),
-          component: "list"
-        });
-      })
-  }
-
-  handleSubmit(event) {
-    event.preventDefault();
-    this.getData();
-  }
-
-  render () {
-
+  render() {
+    let restaurants = this.state.restaurants.map(restaurant => {
+      let handleDelete = () => {
+        this.handleDelete(restaurant.id)
+      }
+      let handleUpVote = () => {
+        this.handleUpVote(restaurant.id)
+      }
+      let handleDownVote = () => {
+        this.handleDownVote(restaurant.id)
+      }
+      return(
+        <Restaurant
+          key={restaurant.id}
+          id={restaurant.id}
+          name={restaurant.name}
+          category={restaurant.category}
+          description={restaurant.description}
+          upVotes={restaurant.up_votes}
+          downVotes={restaurant.down_votes}
+          handleDelete={handleDelete}
+          handleUpVote={handleUpVote}
+          handleDownVote={handleDownVote}
+         />
+      )
+    })
     return(
       <div>
+        <h1 className="columns small-4 small-centered">Fast-Food Fiend</h1>
+        <h2 className="columns small-4 small-centered">New Restaurant</h2>
+        <Form
+          handleNameChange={this.handleNameChange}
+          handleCategoryChange={this.handleCategoryChange}
+          handleDescriptionChange={this.handleDescriptionChange}
+          handleSubmit={this.handleSubmit}
+        />
+        {restaurants}
       </div>
       )
     }

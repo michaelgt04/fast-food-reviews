@@ -3,7 +3,10 @@ class RestaurantsController < ApplicationController
     @restaurants = Restaurant.all
     respond_to do |format|
       format.html
-      format.json { render json: @bars}
+      format.json { render json: @restaurants}
     end
+  end
+
+  def create
   end
 end
