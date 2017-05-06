@@ -1,21 +1,40 @@
-# README
+# Integrating React with Rails Clinic
 
-This repository has all the code necessary for starting a React on Rails application
-including testing. To get started, just clone the repository down and get started using
-React on Rails like you normally would.
+## Description
 
-## Areas in the Boilerplate to Update
-Be sure to search `boilerplate` within your project and update any references to
-boilerplate with the name of your application. If you do not follow this step, your
-application may not behave the way that you expect it to.
+Finally we get to integrate everything we've learned into one application! This repo
+should provide a solid pattern for you to create your own React on Rails application.
+Remember that our React front end is fetching data from our Rails backend and then
+displaying that information. I included an `ajax` call in with the application
+so that you all know what that looks like (since you will almost certainly see
+it wherever you are hired in their legacy JS code). Don't feel like you need to implement
+`ajax` on your own, but just know it's a possibility you could see.
 
-## Ideas for Getting Started
-Potential places to start for a side project:
-* Find an API that interests you and display the information in an interesting way
-* Make a clone of a website that already exists
-* Make a game that users can play on a website
-* Extend an assignment that you've already done to add additional features
+## A note on Forms
 
-No idea is too small, weird or insignificant to get started with. If you're interested
-in the project, you'll keep working on it and learn a lot about coding. Download the
-boilerplate, make those first commits and enjoy!
+Yes, it is a little crazy to have to define handler functions for each of the form
+fields, but this is how React works and what allows for you to do some really cool
+things as you get more advanced. Because the state tracks changes as they are typed
+you can do awesome things, like validate user input as it's typed, when you get more
+familiar with React. Embrace the craziness and you shall reap the reward.
+
+## Things to Watch Out For
+
+I also just want to list out a few things that can trip you up as you start to create
+your own React-Rails apps:
+
+1.  Make sure you're following a RESTful pattern for your API. It will make it easier
+for you to setup and easier for other developers to work with in the future.
+
+2.  Format your post requests to the back end the right way! If you forget to
+`JSON.stringify` the body on the React side, your Rails controller won't get the body
+back to it.
+
+3.  Just like everything in React, take your time getting it setup and get one thing
+working at a time. Make sure your components are hooked up the right way, then worry
+about their functionality. Isolate the number of things you're changing at any
+given time and you'll make debugging far easier!
+
+4.  Have fun with it! Yes, there are going to be a lot of challenges to getting your
+React app setup in Rails, but the curriculum is finally coming completely together. Be excited
+and proud that you've made it this far and you're getting a chance to build this tech.
